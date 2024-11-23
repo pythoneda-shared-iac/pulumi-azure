@@ -40,18 +40,14 @@ from .dns_record import DnsRecord
 from .network_security_group import NetworkSecurityGroup
 from .blob_container import BlobContainer
 from .blob import Blob
-from .functions_package import FunctionsPackage
 from .front_door import FrontDoor
 from .frontend_endpoint import FrontendEndpoint
 from .web_app_deployment_slot import WebAppDeploymentSlot
-from .functions_deployment_slot import FunctionsDeploymentSlot
 from .web_app_host_name_binding import WebAppHostNameBinding
 from .app_insights import AppInsights
 from .container_registry import ContainerRegistry
 from .role_definition import RoleDefinition
 from .docker_pull_role_assignment import DockerPullRoleAssignment
 from .docker_pull_role_definition import DockerPullRoleDefinition
-from .pulumi_azure_stack import PulumiAzureStack
-from .pulumi_azure_stack_factory import PulumiAzureStackFactory
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

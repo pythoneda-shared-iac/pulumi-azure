@@ -24,16 +24,17 @@ from .api_management_service import ApiManagementService
 from .resource_group import ResourceGroup
 import pulumi
 import pulumi_azure_native
+from typing import List
 
 
 class Api(AzureResource):
     """
-    Azure Api for Licdata.
+    Azure Api.
 
     Class name: Api
 
     Responsibilities:
-        - Define the Azure Api for Licdata.
+        - Define the Azure Api.
 
     Collaborators:
         - None
@@ -44,6 +45,8 @@ class Api(AzureResource):
         stackName: str,
         projectName: str,
         location: str,
+        path: str,
+        protocols: List[str],
         apiManagementService: ApiManagementService,
         resourceGroup: ResourceGroup,
     ):
@@ -55,6 +58,10 @@ class Api(AzureResource):
         :type projectName: str
         :param location: The Azure location.
         :type location: str
+        :param path: The path.
+        :type path: str
+        :param protocols: The protocols.
+        :type protocols: List[str]
         :param apiManagementService: The ApiManagementService.
         :type apiManagementService: pythoneda.iac.pulumi.azure.ApiManagementService
         :param resourceGroup: The ResourceGroup.
@@ -69,6 +76,26 @@ class Api(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
+        self._path = path
+        self._protocols = protocols
+
+    @property
+    def path(self) -> str:
+        """
+        Retrieves the path.
+        :return: The path.
+        :rtype: str
+        """
+        return self._path
+
+    @property
+    def protocols(self) -> List[str]:
+        """
+        Retrieves the protocols.
+        :return: The protocols.
+        :rtype: List[str]
+        """
+        return self._protocols if self._protocols is not None else ["https"]
 
     # @override
     def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
@@ -98,8 +125,8 @@ class Api(AzureResource):
             name,
             resource_group_name=self.resource_group.name,
             service_name=api_management_service.name,
-            path="licenses",
-            protocols=["https"],
+            path=self.path,
+            protocols=self.protocols,
             display_name=f"{stackName}-{projectName}-{location} API",
         )
 

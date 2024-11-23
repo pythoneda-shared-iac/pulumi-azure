@@ -19,20 +19,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from .resource_group import ResourceGroup
-from .storage_account import StorageAccount
+from pythoneda.iac.pulumi.azure import ResourceGroup, StorageAccount
 import pulumi
-import pulumi_azure_native
 
 
 class FunctionStorageAccount(StorageAccount):
     """
-    Azure Function Storage Account for Licdata.
+    Azure Function Storage Account.
 
     Class name: FunctionStorageAccount
 
     Responsibilities:
-        - Define the Azure Function Storage Account for Licdata.
+        - Define the Azure Function Storage Account.
 
     Collaborators:
         - None
@@ -54,7 +52,7 @@ class FunctionStorageAccount(StorageAccount):
         :param location: The Azure location.
         :type location: str
         :param resourceGroup: The ResourceGroup.
-        :type resourceGroup: pulumi_azure_native.resources.ResourceGroup
+        :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
         super().__init__(
             stackName,
@@ -83,11 +81,11 @@ class FunctionStorageAccount(StorageAccount):
         return "saf"
 
     # @override
-    def _post_create(self, resource: pulumi_azure_native.storage.StorageAccount):
+    def _post_create(self, resource: StorageAccount):
         """
         Post-create hook.
         :param resource: The resource.
-        :type resource: pulumi_azure_native.storage.StorageAccount
+        :type resource: pythoneda.iac.pulumi.azure.StorageAccount
         """
         resource.name.apply(
             lambda name: pulumi.export(f"function_storage_account", name)

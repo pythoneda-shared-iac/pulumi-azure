@@ -132,9 +132,7 @@ class ContainerRegistry(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.containerregistry.Registry
         """
-        resource.name.apply(
-            lambda name: pulumi.export("licenses_container_registry", name)
-        )
+        resource.name.apply(lambda name: pulumi.export("container_registry", name))
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

@@ -84,10 +84,6 @@ class FrontendEndpoint(AzureResource):
         )
         self._endpoint_name = endpointName
 
-        self._frontend_endpoint = self.create_frontend_endpoint(
-            "license", "licenseEndpoint", frontDoor, dnsRecord, dnsZone, resourceGroup
-        )
-
     @property
     def endpoint_name(self) -> str:
         """
@@ -95,7 +91,7 @@ class FrontendEndpoint(AzureResource):
         :return: The endpoint name.
         :rtype: str
         """
-        return self._endpoint_name if self._endpoint_name is not None else "licdata"
+        return self._endpoint_name
 
     # @override
     def _resource_name(self, stackName: str, projectName: str, location: str) -> str:

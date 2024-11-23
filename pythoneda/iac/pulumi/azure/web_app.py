@@ -33,12 +33,12 @@ from pulumi import Output
 
 class WebApp(AzureResource):
     """
-    Azure Web App for Licdata.
+    Azure Web App.
 
     Class name: WebApp
 
     Responsibilities:
-        - Define the Azure Web App for Licdata.
+        - Define the Azure Web App.
 
     Collaborators:
         - None
@@ -49,6 +49,9 @@ class WebApp(AzureResource):
         stackName: str,
         projectName: str,
         location: str,
+        imageName: str,
+        imageVersion: str,
+        loginServer: str,
         appInsights: AppInsights,
         storageAccount: StorageAccount,
         appServicePlan: AppServicePlan,
@@ -63,6 +66,12 @@ class WebApp(AzureResource):
         :type projectName: str
         :param location: The Azure location.
         :type location: str
+        :param imageName: The name of the image.
+        :type imageName: str
+        :param imageVersion: The version of the image.
+        :type imageVersion: str
+        :param loginServer: The login server.
+        :type loginServer: str
         :param appInsights: The App Insights instance.
         :type appInsights: pythoneda.iac.pulumi.azure.AppInsights
         :param storageAccount: The StorageAccount.
@@ -86,6 +95,37 @@ class WebApp(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
+
+        self._image_name = imageName
+        self._image_version = imageVersion
+        self._login_server = loginServer
+
+    @property
+    def image_name(self) -> str:
+        """
+        Retrieves the image name.
+        :return: Such name.
+        :rtype: str
+        """
+        return self._image_name
+
+    @property
+    def image_version(self) -> str:
+        """
+        Retrieves the image version.
+        :return: Such version.
+        :rtype: str
+        """
+        return self._image_version
+
+    @property
+    def login_server(self) -> str:
+        """
+        Retrieves the login server.
+        :return: Such server.
+        :rtype: str
+        """
+        return self._login_server
 
     # @override
     def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
@@ -111,17 +151,7 @@ class WebApp(AzureResource):
         :return: The Azure Function App.
         :rtype: pulumi_azure_native.web.WebApp
         """
-        # login_server = containerRegistry.login_server.apply(lambda name: name)
-        login_server = "licenses.azurecr.io"
-        image_url = f"{login_server}/licdata:latest"
-        # login_server = containerRegistry.name.apply(
-        #    lambda name: f"{name}.azurecr.io/licdata:latest"
-        # )
-        # self.__class__.logger().info(f"login_server: {login_server}")
-
-        # pulumi.Output.concat(
-        #    containerRegistry.login_server, "/licdata:latest"
-        # )
+        image_url = f"{self.login_server}/{self.image_name}:{self.image_version}"
         acr_credentials = (
             pulumi_azure_native.containerregistry.list_registry_credentials(
                 resource_group_name=self.resource_group.name,
@@ -200,7 +230,7 @@ class WebApp(AzureResource):
                     ),
                     pulumi_azure_native.web.NameValuePairArgs(
                         name="DOCKER_REGISTRY_SERVER_URL",
-                        value=f"https://{login_server}",
+                        value=f"https://{self.login_server}",
                     ),
                     pulumi_azure_native.web.NameValuePairArgs(
                         name="DOCKER_REGISTRY_SERVER_USERNAME", value=acr_username

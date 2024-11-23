@@ -67,9 +67,6 @@ class DnsZone(AzureResource):
         )
         self._zone_type = zoneType
         self._domain_name = domainName
-        self._dns_zone = self.create_dns_zone(
-            "licenses", "licenses.acmsl.org", resourceGroup
-        )
 
     @property
     def zone_type(self) -> str:
