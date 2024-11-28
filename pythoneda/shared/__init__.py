@@ -1,8 +1,8 @@
 # vim: set fileencoding=utf-8
 """
-pythoneda/__init__.py
+pythoneda/shared/__init__.py
 
-This file ensures pythoneda is a package.
+This file ensures pythoneda.shared is a package.
 
 Copyright (C) 2024-today pythoneda-shared-iac/pulumi-azure
 
