@@ -105,7 +105,7 @@ class AppServicePlan(AzureResource):
         :return: Such name.
         :rtype: str
         """
-        return self._tier_name if self._tier_name is not None else "S1"
+        return self._tier_name if self._tier_name is not None else "B1"
 
     @property
     def capacity(self) -> int:
@@ -168,7 +168,7 @@ class AppServicePlan(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.AppServicePlan
         """
-        resource.name.apply(lambda name: pulumi.export("app_service_plan", name))
+        pulumi.export("app_service_plan", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

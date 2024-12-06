@@ -52,6 +52,7 @@ class WebApp(AzureResource):
         imageName: str,
         imageVersion: str,
         loginServer: str,
+        linuxFxVersion: str,
         appInsights: AppInsights,
         storageAccount: StorageAccount,
         appServicePlan: AppServicePlan,
@@ -72,6 +73,8 @@ class WebApp(AzureResource):
         :type imageVersion: str
         :param loginServer: The login server.
         :type loginServer: str
+        :param linuxFxVersion: The Linux FX version.
+        :type linuxFxVersion: str
         :param appInsights: The App Insights instance.
         :type appInsights: pythoneda.iac.pulumi.azure.AppInsights
         :param storageAccount: The StorageAccount.
@@ -99,6 +102,7 @@ class WebApp(AzureResource):
         self._image_name = imageName
         self._image_version = imageVersion
         self._login_server = loginServer
+        self._linux_fx_version = linuxFxVersion
 
     @property
     def image_name(self) -> str:
@@ -127,6 +131,15 @@ class WebApp(AzureResource):
         """
         return self._login_server
 
+    @property
+    def linux_fx_version(self) -> str:
+        """
+        Retrieves the Linux FX version.
+        :return: Such version.
+        :rtype: str
+        """
+        return self._linux_fx_version
+
     # @override
     def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
         """
@@ -151,7 +164,16 @@ class WebApp(AzureResource):
         :return: The Azure Function App.
         :rtype: pulumi_azure_native.web.WebApp
         """
-        image_url = f"{self.login_server}/{self.image_name}:{self.image_version}"
+        image_url = self.login_server.apply(
+            lambda login_server: f"{login_server}/{self.image_name}:{self.image_version}"
+        )
+        pulumi.export("image_url", image_url)
+
+        if self.linux_fx_version is None:
+            linux_fx_version = image_url.apply(lambda url: f"DOCKER|{url}")
+
+        pulumi.export("linux_fx_version", linux_fx_version)
+
         acr_credentials = (
             pulumi_azure_native.containerregistry.list_registry_credentials(
                 resource_group_name=self.resource_group.name,
@@ -191,7 +213,7 @@ class WebApp(AzureResource):
                         name="WEBSITE_RUN_FROM_PACKAGE", value="1"
                     ),
                     pulumi_azure_native.web.NameValuePairArgs(
-                        name="FUNCTIONS_WORKER_RUNTIME", value="python"
+                        name="FUNCTIONS_WORKER_RUNTIME", value="custom"
                     ),
                     pulumi_azure_native.web.NameValuePairArgs(
                         name="AzureWebJobsSecretStorageType", value="files"
@@ -243,7 +265,7 @@ class WebApp(AzureResource):
                     ),
                 ],
                 cors=pulumi_azure_native.web.CorsSettingsArgs(allowed_origins=["*"]),
-                linux_fx_version=f"DOCKER|{image_url}",
+                linux_fx_version=linux_fx_version,
                 http_logging_enabled=True,
                 http20_enabled=True,
                 ftps_state="AllAllowed",
@@ -263,10 +285,7 @@ class WebApp(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.WebApp
         """
-        resource.name.apply(lambda name: pulumi.export(f"function_app", name))
-        resource.default_host_name.apply(
-            lambda name: pulumi.export("function_app_url", f"https://{name}")
-        )
+        pass
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et
