@@ -22,7 +22,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from .azure_resource import AzureResource
 from .resource_group import ResourceGroup
 import pulumi
+from pulumi import Output
 import pulumi_azure_native
+from pulumi_azure_native.containerregistry import list_registry_credentials
 
 
 class ContainerRegistry(AzureResource):
@@ -132,7 +134,18 @@ class ContainerRegistry(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.containerregistry.Registry
         """
-        resource.name.apply(lambda name: pulumi.export("container_registry", name))
+        pulumi.export("container_registry", resource.name)
+        credentials = Output.all(self.resource_group.name, resource.name).apply(
+            lambda args: list_registry_credentials(
+                resource_group_name=args[0], registry_name=args[1]
+            )
+        )
+        username = credentials.apply(lambda c: c.username)
+        pulumi.export("container_registry_username", username)
+        password = credentials.apply(lambda c: c.passwords[0].value)
+        pulumi.export("container_registry_password", password)
+        url = resource.login_server.apply(lambda name: name)
+        pulumi.export("container_registry_url", url)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

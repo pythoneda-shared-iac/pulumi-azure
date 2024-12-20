@@ -132,7 +132,8 @@ class PublicIpAddress(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.network.PublicIPAddress
         """
-        resource.ip_address.apply(lambda ip: pulumi.export("public_ip_address", ip))
+        pulumi.export("public_ip_address", resource.name)
+        pulumi.export("public_ip_address_value", resource.ip_address)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

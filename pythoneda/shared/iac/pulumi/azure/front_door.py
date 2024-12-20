@@ -128,15 +128,7 @@ class FrontDoor(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.cdn.Profile
         """
-        resource.name.apply(lambda name: pulumi.export("front_door", name))
-
-    def __getattr__(self, attr):
-        """
-        Delegates attribute/method lookup to the wrapped instance.
-        :param attr: The attribute.
-        :type attr: Any
-        """
-        return getattr(self._front_door, attr)
+        pulumi.export("front_door", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

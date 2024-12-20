@@ -166,15 +166,7 @@ class CosmosdbAccount(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.documentdb.DatabaseAccount
         """
-        resource.name.apply(lambda name: pulumi.export("cosmosdb_account", name))
-
-    def __getattr__(self, attr):
-        """
-        Delegates attribute/method lookup to the wrapped instance.
-        :param attr: The attribute.
-        :type attr: Any
-        """
-        return getattr(self._api_service_plan, attr)
+        pulumi.export("cosmosdb_account", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

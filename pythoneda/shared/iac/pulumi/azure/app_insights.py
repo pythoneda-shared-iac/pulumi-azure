@@ -129,7 +129,7 @@ class AppInsights(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.insights.Component
         """
-        resource.name.apply(lambda name: pulumi.export(f"ApplicationInsights", name))
+        pulumi.export(f"application_insights", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

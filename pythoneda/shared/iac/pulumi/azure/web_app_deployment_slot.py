@@ -131,7 +131,7 @@ class WebAppDeploymentSlot(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.WebAppDeploymentSlot
         """
-        resource.name.apply(lambda name: pulumi.export("webapp_deployment_slot", name))
+        pulumi.export("webapp_deployment_slot", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

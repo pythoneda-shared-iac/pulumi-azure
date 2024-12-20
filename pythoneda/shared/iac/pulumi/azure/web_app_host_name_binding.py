@@ -144,7 +144,7 @@ class WebAppHostNameBinding(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.WebAppHostNameBinding
         """
-        resource.name.apply(lambda name: pulumi.export("host_name_binding", name))
+        pulumi.export("host_name_binding", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

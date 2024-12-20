@@ -152,7 +152,7 @@ class Blob(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.storage.Blob
         """
-        resource.name.apply(lambda name: pulumi.export("blob", name))
+        pulumi.export("blob", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

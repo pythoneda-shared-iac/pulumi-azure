@@ -149,7 +149,7 @@ class DnsRecord(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.network.RecordSet
         """
-        resource.name.apply(lambda name: pulumi.export("dns_record", name))
+        pulumi.export("dns_record", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

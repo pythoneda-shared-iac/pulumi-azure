@@ -285,7 +285,7 @@ class WebApp(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.WebApp
         """
-        pass
+        pulumi.export("web_app", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

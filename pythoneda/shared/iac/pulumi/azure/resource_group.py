@@ -84,7 +84,7 @@ class ResourceGroup(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.resources.ResourceGroup
         """
-        resource.name.apply(lambda name: pulumi.export("resource_group", name))
+        pulumi.export("resource_group", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

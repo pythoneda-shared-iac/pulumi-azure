@@ -134,7 +134,7 @@ class FrontendEndpoint(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.cdn.AFDEndpoint
         """
-        resource.name.apply(lambda name: pulumi.export("frontend_endpoint", name))
+        pulumi.export("frontend_endpoint", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

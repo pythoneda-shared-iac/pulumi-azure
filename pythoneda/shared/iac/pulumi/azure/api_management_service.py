@@ -154,7 +154,7 @@ class ApiManagementService(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.apimanagement.ApiManagementService
         """
-        resource.name.apply(lambda name: pulumi.export(f"api_management_service", name))
+        pulumi.export(f"api_management_service", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

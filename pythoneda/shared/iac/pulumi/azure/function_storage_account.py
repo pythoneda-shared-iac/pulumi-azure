@@ -88,9 +88,7 @@ class FunctionStorageAccount(StorageAccount):
         :param resource: The resource.
         :type resource: pythoneda.iac.pulumi.azure.StorageAccount
         """
-        resource.name.apply(
-            lambda name: pulumi.export(f"function_storage_account", name)
-        )
+        pulumi.export("function_storage_account", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

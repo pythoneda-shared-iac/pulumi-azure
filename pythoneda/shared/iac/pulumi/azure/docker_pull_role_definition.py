@@ -99,9 +99,7 @@ class DockerPullRoleDefinition(RoleDefinition):
         :param resource: The resource.
         :type resource: pulumi_azure_native.authorization.RoleDefinition
         """
-        resource.name.apply(
-            lambda name: pulumi.export(f"docker_pull_role_definition", name)
-        )
+        pulumi.export(f"docker_pull_role_definition", resource.name)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et
