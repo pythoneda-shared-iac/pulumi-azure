@@ -111,7 +111,8 @@ class ApiManagementService(AzureResource):
         return self._capacity if self._capacity is not None else 0
 
     # @override
-    def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
+    @classmethod
+    def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:
         """
         Builds the resource name.
         :param stackName: The name of the stack.

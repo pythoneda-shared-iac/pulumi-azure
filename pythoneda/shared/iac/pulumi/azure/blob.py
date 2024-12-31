@@ -113,7 +113,8 @@ class Blob(AzureResource):
         return self._source
 
     # @override
-    def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
+    @classmethod
+    def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:
         """
         Builds the resource name.
         :param stackName: The name of the stack.
@@ -125,7 +126,7 @@ class Blob(AzureResource):
         :return: The resource name.
         :rtype: str
         """
-        return "b{self.name}"
+        return "b"
 
     # @override
     def _create(self, name: str) -> pulumi_azure_native.storage.Blob:

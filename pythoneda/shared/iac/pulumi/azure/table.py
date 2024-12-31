@@ -81,7 +81,8 @@ class Table(AzureResource):
         return self._name
 
     # @override
-    def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
+    @classmethod
+    def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:
         """
         Builds the resource name.
         :param stackName: The name of the stack.
@@ -93,7 +94,7 @@ class Table(AzureResource):
         :return: The resource name.
         :rtype: str
         """
-        return f"t{self.name}"
+        return "t"
 
     # @override
     def _create(self, name: str) -> pulumi_azure_native.storage.Table:

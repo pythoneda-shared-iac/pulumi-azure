@@ -87,7 +87,8 @@ class DnsZone(AzureResource):
         return self._domain_name
 
     # @override
-    def _resource_name(self, stackName: str, projectName: str, location: str) -> str:
+    @classmethod
+    def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:
         """
         Builds the resource name.
         :param stackName: The name of the stack.

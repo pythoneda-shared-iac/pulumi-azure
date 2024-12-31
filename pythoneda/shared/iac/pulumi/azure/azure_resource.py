@@ -59,8 +59,9 @@ class AzureResource(Resource, abc.ABC):
         """
         super().__init__(stackName, projectName, location, dependencies)
 
+    @classmethod
     @property
-    def max_length(self) -> int:
+    def max_length(cls) -> int:
         """
         The maximum length of the resource name.
         :return: The maximum length.
