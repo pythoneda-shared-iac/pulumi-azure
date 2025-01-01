@@ -80,5 +80,16 @@ class AzureResource(Resource, abc.ABC):
         """
         return cls._location_abbrevs.get(location, cls._location_abbrevs["unknown"])
 
+    @classmethod
+    @property
+    @abc.abstractmethod
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        pass
+
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

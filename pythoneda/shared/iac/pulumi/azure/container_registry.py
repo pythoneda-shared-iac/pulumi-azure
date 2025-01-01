@@ -90,6 +90,16 @@ class ContainerRegistry(AzureResource):
             self._admin_user_enabled if self._admin_user_enabled is not None else True
         )
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.ContainerRegistry/registries"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

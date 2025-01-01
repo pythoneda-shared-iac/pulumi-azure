@@ -92,6 +92,16 @@ class PublicIpAddress(AzureResource):
             self._ip_address_type if self._ip_address_type is not None else "Standard"
         )
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Network/publicIPAddresses"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

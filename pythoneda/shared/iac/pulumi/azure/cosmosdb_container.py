@@ -96,6 +96,16 @@ class CosmosdbContainer(AzureResource):
             ),
         )
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.DocumentDB/databaseAccounts/sqlContainers"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

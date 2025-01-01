@@ -102,6 +102,16 @@ class WebAppHostNameBinding(AzureResource):
         """
         return self._custom_host_name
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Web/sites/hostNameBindings"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

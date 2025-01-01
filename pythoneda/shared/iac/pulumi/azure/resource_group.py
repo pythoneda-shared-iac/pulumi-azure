@@ -49,6 +49,16 @@ class ResourceGroup(AzureResource):
         """
         super().__init__(stackName, projectName, location, {})
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Resources/resourceGroups"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

@@ -93,6 +93,16 @@ class FrontendEndpoint(AzureResource):
         """
         return self._endpoint_name
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Cdn/profiles/endpoints"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

@@ -120,6 +120,16 @@ class CosmosdbAccount(AzureResource):
         """
         return self._enable_free_tier if self._enable_free_tier is not None else True
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.DocumentDB/databaseAccounts"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

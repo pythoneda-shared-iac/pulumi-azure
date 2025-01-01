@@ -103,6 +103,16 @@ class DnsRecord(AzureResource):
             "api", dnsZone, resourceGroup, "A", 3600, publicIpAddress.ip_address
         )
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Network/dnszones/A"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

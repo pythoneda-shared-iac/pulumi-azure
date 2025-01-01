@@ -81,6 +81,16 @@ class BlobContainer(AzureResource):
         """
         return self._public_access if self._public_access is not None else "Blob"
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Storage/storageAccounts/blobServices/containers"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

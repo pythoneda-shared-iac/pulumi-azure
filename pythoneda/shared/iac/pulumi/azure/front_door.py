@@ -90,6 +90,16 @@ class FrontDoor(AzureResource):
             else "Standard_AzureFrontDoor"
         )
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Network/frontDoors"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:

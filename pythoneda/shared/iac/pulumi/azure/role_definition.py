@@ -131,6 +131,16 @@ class RoleDefinition(AzureResource, abc.ABC):
         """
         return self._permissions
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Authorization/roleDefinitions"
+
     # @override
     def _create(self, name: str) -> pulumi_azure_native.authorization.RoleDefinition:
         """

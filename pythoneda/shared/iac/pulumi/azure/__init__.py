@@ -47,6 +47,7 @@ from .web_app_host_name_binding import WebAppHostNameBinding
 from .app_insights import AppInsights
 from .container_registry import ContainerRegistry
 from .role_definition import RoleDefinition
+from .role_assignment import RoleAssignment
 from .docker_pull_role_assignment import DockerPullRoleAssignment
 from .docker_pull_role_definition import DockerPullRoleDefinition
 

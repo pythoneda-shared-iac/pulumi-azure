@@ -107,6 +107,16 @@ class StorageAccount(AzureResource, abc.ABC):
             else True
         )
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.Storage/storageAccounts"
+
     # @override
     def _create(self, name: str) -> pulumi_azure_native.storage.StorageAccount:
         """

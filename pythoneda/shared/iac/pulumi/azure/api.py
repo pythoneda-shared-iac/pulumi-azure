@@ -97,6 +97,16 @@ class Api(AzureResource):
         """
         return self._protocols if self._protocols is not None else ["https"]
 
+    @classmethod
+    @property
+    def type(cls) -> str:
+        """
+        Retrieves the type of resource.
+        :return: Such type.
+        :rtype: str
+        """
+        return "Microsoft.ApiManagement/service/apis"
+
     # @override
     @classmethod
     def _resource_name(cls, stackName: str, projectName: str, location: str) -> str:
