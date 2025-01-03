@@ -74,17 +74,17 @@ class RoleDefinition(AzureResource, abc.ABC):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pulumi_azure_native.resources.ResourceGroup
         """
+        self._role_name = roleName
+        self._description = description
+        self._scope = scope
+        self._assignable_scopes = assignableScopes
+        self._permissions = permissions
         super().__init__(
             stackName,
             projectName,
             location,
             {"resource_group": resourceGroup},
         )
-        self._role_name = roleName
-        self._description = description
-        self._scope = scope
-        self._assignable_scopes = assignableScopes
-        self._permissions = permissions
 
     @property
     def role_name(self) -> str:
@@ -157,6 +157,25 @@ class RoleDefinition(AzureResource, abc.ABC):
             assignable_scopes=self.assignable_scopes,
             permissions=self.permissions,
             scope=self.scope,
+        )
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.authorization.RoleDefinition:
+        """
+        Retrieves a RoleDefinition instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The RoleDefinition.
+        :rtype: pulumi_azure_native.authorization.RoleDefinition
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.authorization.RoleDefinition.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
         )
 
 

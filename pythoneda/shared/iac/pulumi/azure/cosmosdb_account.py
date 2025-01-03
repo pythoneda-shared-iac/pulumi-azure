@@ -20,10 +20,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
 from pulumi_azure_native import apimanagement, resources, storage, web, sql, network
+from .resource_group import ResourceGroup
 from typing import Any, Dict
 
 
@@ -70,13 +71,13 @@ class CosmosdbAccount(AzureResource):
         :param resourceGroup: The Azure Resource Group.
         :type resourceGroup: pulumi_azure_native.resources.ResourceGroup
         """
-        super().__init__(
-            stackName, projectName, location, {"resource_group": resourceGroup}
-        )
         self._kind = kind
         self._offer_type = offerType
         self._consistency_policy = consistencyPolicy
         self._enable_free_tier = enableFreeTier
+        super().__init__(
+            stackName, projectName, location, {"resource_group": resourceGroup}
+        )
 
     @property
     def kind(self) -> str:
@@ -177,7 +178,27 @@ class CosmosdbAccount(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.documentdb.DatabaseAccount
         """
-        pulumi.export("cosmosdb_account", resource.name)
+        pulumi.export(Outputs.COSMOSDB_ACCOUNT.value, resource.name)
+        pulumi.export(Outputs.COSMOSDB_ACCOUNT_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.documentdb.DatabaseAccount:
+        """
+        Retrieves a Cosmosdb account from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The DatabaseAccount.
+        :rtype: pulumi_azure_native.documentdb.DatabaseAccount
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.documentdb.DatabaseAccount.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

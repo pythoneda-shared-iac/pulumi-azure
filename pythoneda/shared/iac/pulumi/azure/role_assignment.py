@@ -21,10 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import abc
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
-from .role_definition import RoleDefinition
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
+from .role_definition import RoleDefinition
 
 
 class RoleAssignment(AzureResource, abc.ABC):
@@ -80,6 +80,25 @@ class RoleAssignment(AzureResource, abc.ABC):
         :rtype: str
         """
         return "Microsoft.Authorization/roleAssignments"
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.authorization.RoleAssignment:
+        """
+        Retrieves a RoleAssignment instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The RoleAssignment.
+        :rtype: pulumi_azure_native.authorization.RoleAssignment
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.authorization.RoleAssignment.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

@@ -21,11 +21,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
 from .container_registry import ContainerRegistry
+from .outputs import Outputs
+import pulumi
+import pulumi_azure_native
 from .resource_group import ResourceGroup
 from .role_definition import RoleDefinition
 from .web_app import WebApp
-import pulumi
-import pulumi_azure_native
 
 
 class DockerPullRoleAssignment(AzureResource):
@@ -121,7 +122,27 @@ class DockerPullRoleAssignment(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.authorization.RoleAssignment
         """
-        pulumi.export("docker_pull_role_assignment", resource.name)
+        pulumi.export(Outputs.DOCKER_PULL_ROLE_ASSIGNMENT.value, resource.name)
+        pulumi.export(Outputs.DOCKER_PULL_ROLE_ASSIGNMENT_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.authorization.RoleAssignment:
+        """
+        Retrieves an RoleAssignment instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The RoleAssignment.
+        :rtype: pulumi_azure_native.authorization.RoleAssignment
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.authorization.RoleAssignment.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

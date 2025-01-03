@@ -19,6 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from .outputs import Outputs
 import pulumi
 from .resource_group import ResourceGroup
 from .storage_account import StorageAccount
@@ -89,7 +90,8 @@ class FunctionStorageAccount(StorageAccount):
         :param resource: The resource.
         :type resource: pythoneda.iac.pulumi.azure.StorageAccount
         """
-        pulumi.export("function_storage_account", resource.name)
+        pulumi.export(Outputs.FUNCTION_STORAGE_ACCOUNT.value, resource.name)
+        pulumi.export(Outputs.FUNCTION_STORAGE_ACCOUNT_ID.value, resource.id)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

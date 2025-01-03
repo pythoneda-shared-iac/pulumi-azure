@@ -20,10 +20,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
-from .storage_account import StorageAccount
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
+from .storage_account import StorageAccount
 from typing import Any
 
 
@@ -64,13 +65,13 @@ class BlobContainer(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pulumi_azure_native.resources.ResourceGroup
         """
+        self._public_access = publicAccess
         super().__init__(
             stackName,
             projectName,
             location,
             {"storage_account": storageAccount, "resource_group": resourceGroup},
         )
-        self._public_access = publicAccess
 
     @property
     def public_access(self) -> str:
@@ -130,7 +131,27 @@ class BlobContainer(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.storage.BlobContainer
         """
-        pulumi.export("blob_container", resource.name)
+        pulumi.export(Outputs.BLOB_CONTAINER.value, resource.name)
+        pulumi.export(Outputs.BLOB_CONTAINER_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.storage.BlobContainer:
+        """
+        Retrieves a BlobContainer instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The BlobContainer.
+        :rtype: pulumi_azure_native.storage.BlobContainer
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.storage.BlobContainer.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

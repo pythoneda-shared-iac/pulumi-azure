@@ -21,9 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
 from .cosmosdb_account import CosmosdbAccount
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class CosmosdbDatabase(AzureResource):
@@ -122,7 +123,27 @@ class CosmosdbDatabase(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.documentdb.SqlResourceSqlDatabase
         """
-        pulumi.export("cosmosdb_database", resource.name)
+        pulumi.export(Outputs.COSMOSDB_DATABASE.value, resource.name)
+        pulumi.export(Outputs.COSMOSDB_DATABASE_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.documentdb.SqlResourceSqlDatabase:
+        """
+        Retrieves a Cosmosdb database from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The SqlResourceSqlDatabase.
+        :rtype: pulumi_azure_native.documentdb.SqlResourceSqlDatabase
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.documentdb.SqlResourceSqlDatabase.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

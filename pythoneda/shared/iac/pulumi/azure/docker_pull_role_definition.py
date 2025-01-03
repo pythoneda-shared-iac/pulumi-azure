@@ -20,10 +20,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .container_registry import ContainerRegistry
-from .resource_group import ResourceGroup
-from .role_definition import RoleDefinition
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
+from .role_definition import RoleDefinition
 
 
 class DockerPullRoleDefinition(RoleDefinition):
@@ -100,7 +101,27 @@ class DockerPullRoleDefinition(RoleDefinition):
         :param resource: The resource.
         :type resource: pulumi_azure_native.authorization.RoleDefinition
         """
-        pulumi.export(f"docker_pull_role_definition", resource.name)
+        pulumi.export(Outputs.DOCKER_PULL_ROLE_DEFINITION.value, resource.name)
+        pulumi.export(Outputs.DOCKER_PULL_ROLE_DEFINITION_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.authorization.RoleDefinition:
+        """
+        Retrieves an RoleDefinition instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The RoleDefinition.
+        :rtype: pulumi_azure_native.authorization.RoleDefinition
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.authorization.RoleDefinition.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

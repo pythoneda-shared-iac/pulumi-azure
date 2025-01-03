@@ -69,12 +69,12 @@ class StorageAccount(AzureResource, abc.ABC):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
-        super().__init__(
-            stackName, projectName, location, {"resource_group": resourceGroup}
-        )
         self._kind = kind
         self._sku_type = skuType
         self._allow_blob_public_access = allowBlobPublicAccess
+        super().__init__(
+            stackName, projectName, location, {"resource_group": resourceGroup}
+        )
 
     @property
     def kind(self) -> str:
@@ -133,6 +133,27 @@ class StorageAccount(AzureResource, abc.ABC):
             sku=pulumi_azure_native.storage.SkuArgs(name=self.sku_type),
             allow_blob_public_access=self.allow_blob_public_access,
             kind=self.kind,
+        )
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.storage.StorageAccount:
+        """
+        Retrieves a StorageAccount instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The StorageAccount.
+        :rtype: pulumi_azure_native.storage.StorageAccount
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.storage.StorageAccount.get(
+                resource_name=args[0],
+                id=args[1],
+                opts=pulumi.ResourceOptions(id=args[1]),
+            )
         )
 
 

@@ -19,10 +19,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from .storage_account import StorageAccount
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
+from .storage_account import StorageAccount
 
 
 class DatabasesStorageAccount(StorageAccount):
@@ -69,7 +70,8 @@ class DatabasesStorageAccount(StorageAccount):
         :param resource: The resource.
         :type resource: pulumi_azure_native.storage.StorageAccount
         """
-        pulumi.export("databases_storage_account", resource.name)
+        pulumi.export(Outputs.DATABASES_STORAGE_ACCOUNT.value, resource.name)
+        pulumi.export(Outputs.DATABASES_STORAGE_ACCOUNT_ID.value, resource.id)
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

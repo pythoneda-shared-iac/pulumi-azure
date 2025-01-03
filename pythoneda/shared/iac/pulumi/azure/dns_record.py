@@ -20,9 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class DnsRecord(AzureResource):
@@ -68,6 +69,8 @@ class DnsRecord(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pulumi_azure_native.resources.ResourceGroup
         """
+        self._record_type = recordType
+        self._ttl = ttl
         super().__init__(
             stackName,
             projectName,
@@ -78,8 +81,6 @@ class DnsRecord(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
-        self._record_type = recordType
-        self._ttl = ttl
 
     @property
     def record_type(self) -> str:
@@ -160,7 +161,27 @@ class DnsRecord(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.network.RecordSet
         """
-        pulumi.export("dns_record", resource.name)
+        pulumi.export(Outputs.DNS_RECORD.value, resource.name)
+        pulumi.export(Outputs.DNS_RECORD_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.network.RecordSet:
+        """
+        Retrieves a RecordSet instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The RecordSet.
+        :rtype: pulumi_azure_native.network.RecordSet
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.network.RecordSet.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

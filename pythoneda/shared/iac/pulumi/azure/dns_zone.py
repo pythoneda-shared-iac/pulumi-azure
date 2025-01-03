@@ -20,9 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class DnsZone(AzureResource):
@@ -62,11 +63,11 @@ class DnsZone(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
+        self._zone_type = zoneType
+        self._domain_name = domainName
         super().__init__(
             stackName, projectName, location, {"resource_group": resourceGroup}
         )
-        self._zone_type = zoneType
-        self._domain_name = domainName
 
     @property
     def zone_type(self) -> str:
@@ -136,7 +137,25 @@ class DnsZone(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.network.Zone
         """
-        pulumi.export("dns_zone", resource.name)
+        pulumi.export(Outputs.DNS_ZONE.value, resource.name)
+        pulumi.export(Outputs.DNS_ZONE_ID.value, resource.id)
+
+    @classmethod
+    def from_id(cls, id: str, name: str = None) -> pulumi_azure_native.network.Zone:
+        """
+        Retrieves a Dns Zone from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The Zone.
+        :rtype: pulumi_azure_native.network.Zone
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.network.Zone.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

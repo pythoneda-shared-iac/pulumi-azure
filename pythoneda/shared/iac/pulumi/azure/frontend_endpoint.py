@@ -23,9 +23,10 @@ from .azure_resource import AzureResource
 from .dns_record import DnsRecord
 from .dns_zone import DnsZone
 from .front_door import FrontDoor
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class FrontendEndpoint(AzureResource):
@@ -71,6 +72,7 @@ class FrontendEndpoint(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
+        self._endpoint_name = endpointName
         super().__init__(
             stackName,
             projectName,
@@ -82,7 +84,6 @@ class FrontendEndpoint(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
-        self._endpoint_name = endpointName
 
     @property
     def endpoint_name(self) -> str:
@@ -145,7 +146,25 @@ class FrontendEndpoint(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.cdn.AFDEndpoint
         """
-        pulumi.export("frontend_endpoint", resource.name)
+        pulumi.export(Outputs.FRONTEND_ENDPOINT.value, resource.name)
+        pulumi.export(Outputs.FRONTEND_ENDPOINT_ID.value, resource.id)
+
+    @classmethod
+    def from_id(cls, id: str, name: str = None) -> pulumi_azure_native.cdn.AFDEndpoint:
+        """
+        Retrieves a AFDEndpoint instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The AFDEndpoint.
+        :rtype: pulumi_azure_native.cdn.AFDEndpoint
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.cdn.AFDEndpoint.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

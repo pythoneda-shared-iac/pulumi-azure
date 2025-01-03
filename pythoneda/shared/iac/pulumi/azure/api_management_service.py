@@ -20,9 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 from typing import Any
 
 
@@ -66,13 +67,13 @@ class ApiManagementService(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
-        super().__init__(
-            stackName, projectName, location, {"resource_group": resourceGroup}
-        )
         self._publisher_email = publisherEmail
         self._publisher_name = publisherName
         self._sku = sku
         self.capacity = capacity
+        super().__init__(
+            stackName, projectName, location, {"resource_group": resourceGroup}
+        )
 
     @property
     def publisher_email(self) -> str:
@@ -165,7 +166,27 @@ class ApiManagementService(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.apimanagement.ApiManagementService
         """
-        pulumi.export(f"api_management_service", resource.name)
+        pulumi.export(Outputs.API_MANAGEMENT_SERVICE.value, resource.name)
+        pulumi.export(Outputs.API_MANAGEMENT_SERVICE_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.apimanagement.ApiManagementService:
+        """
+        Retrieves an ApiManagementService instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The ApiManagementService.
+        :rtype: pulumi_azure_native.apimanagement.ApiManagementService
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.apimanagement.ApiManagementService.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

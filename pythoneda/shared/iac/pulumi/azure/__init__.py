@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
 
+from .outputs import Outputs
 from .azure_resource import AzureResource
 from .resource_group import ResourceGroup
 from .cosmosdb_account import CosmosdbAccount

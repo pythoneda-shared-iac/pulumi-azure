@@ -20,9 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class PublicIpAddress(AzureResource):
@@ -62,11 +63,11 @@ class PublicIpAddress(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pulumi_azure_native.resources.ResourceGroup
         """
+        self._public_ip_allocation_method = publicIpAllocationMethod
+        self._ip_address_type = ipAddressType
         super().__init__(
             stackName, projectName, location, {"resource_group": resourceGroup}
         )
-        self._public_ip_allocation_method = publicIpAllocationMethod
-        self._ip_address_type = ipAddressType
 
     @property
     def public_ip_allocation_method(self) -> str:
@@ -143,8 +144,28 @@ class PublicIpAddress(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.network.PublicIPAddress
         """
-        pulumi.export("public_ip_address", resource.name)
-        pulumi.export("public_ip_address_value", resource.ip_address)
+        pulumi.export(Outputs.PUBLIC_IP_ADDRESS.value, resource.name)
+        pulumi.export(Outputs.PUBLIC_IP_ADDRESS_ID.value, resource.id)
+        pulumi.export(Outputs.PUBLIC_IP_ADDRESS_VALUE, resource.ip_address)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.network.PublicIPAddress:
+        """
+        Retrieves a PublicIPAddress instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The PublicIPAddress.
+        :rtype: pulumi_azure_native.network.PublicIPAddress
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.network.PublicIPAddress.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

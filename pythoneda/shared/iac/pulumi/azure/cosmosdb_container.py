@@ -22,9 +22,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from .azure_resource import AzureResource
 from .cosmosdb_account import CosmosdbAccount
 from .cosmosdb_database import CosmosdbDatabase
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 from typing import Dict
 
 
@@ -66,6 +67,7 @@ class CosmosdbContainer(AzureResource):
         :param cosmosdbDatabase: The CosmosDB database.
         :param cosmosdbDatabase: pythoneda.iac.pulumi.azure.CosmosdbDatabase
         """
+        self._partition_key = partitionKey
         super().__init__(
             stackName,
             projectName,
@@ -76,7 +78,6 @@ class CosmosdbContainer(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
-        self._partition_key = partitionKey
 
     @property
     def partition_key(self) -> Dict[str, str]:
@@ -154,7 +155,27 @@ class CosmosdbContainer(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.documentdb.SqlResourceSqlContainer
         """
-        pulumi.export("cosmosdb_container", resource.name)
+        pulumi.export(Outputs.COSMOSDB_CONTAINER.value, resource.name)
+        pulumi.export(Outputs.COSMOSDB_CONTAINER_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.documentdb.SqlResourceSqlContainer:
+        """
+        Retrieves a Cosmosdb Container from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The SqlResourceSqlContainer.
+        :rtype: pulumi_azure_native.documentdb.SqlResourceSqlContainer
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.documentdb.SqlResourceSqlContainer.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

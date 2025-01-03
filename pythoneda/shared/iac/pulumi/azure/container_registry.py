@@ -20,11 +20,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 from pulumi import Output
 import pulumi_azure_native
 from pulumi_azure_native.containerregistry import list_registry_credentials
+from .resource_group import ResourceGroup
 
 
 class ContainerRegistry(AzureResource):
@@ -64,11 +65,11 @@ class ContainerRegistry(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
+        self._sku_type = skuType
+        self._admin_user_enabled = adminUserEnabled
         super().__init__(
             stackName, projectName, location, {"resource_group": resourceGroup}
         )
-        self._sku_type = skuType
-        self._admin_user_enabled = adminUserEnabled
 
     @property
     def sku_type(self) -> str:
@@ -145,18 +146,43 @@ class ContainerRegistry(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.containerregistry.Registry
         """
-        pulumi.export("container_registry", resource.name)
+        pulumi.export(Outputs.CONTAINER_REGISTRY.value, resource.name)
+        pulumi.export(Outputs.CONTAINER_REGISTRY_ID.value, resource.id)
         credentials = Output.all(self.resource_group.name, resource.name).apply(
             lambda args: list_registry_credentials(
                 resource_group_name=args[0], registry_name=args[1]
             )
         )
-        username = credentials.apply(lambda c: c.username)
-        pulumi.export("container_registry_username", username)
-        password = credentials.apply(lambda c: c.passwords[0].value)
-        pulumi.export("container_registry_password", password)
+        pulumi.export(Outputs.CONTAINER_REGISTRY_USERNAME.value, credentials.username)
+        pulumi.export(
+            Outputs.CONTAINER_REGISTRY_PASSWORD.value, credentials.passwords[0].value
+        )
         url = resource.login_server.apply(lambda name: name)
-        pulumi.export("container_registry_url", url)
+        pulumi.export(Outputs.CONTAINER_REGISTRY_URL.value, url)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str, location: str
+    ) -> pulumi_azure_native.containerregistry.Registry:
+        """
+        Retrieves a ContainerRegistry instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :param location: The location.
+        :type location: str
+        :return: The ContainerRegistry.
+        :rtype: pulumi_azure_native.containerregistry.Registry
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.containerregistry.Registry(
+                args[0],
+                resource_group_name=args[0],
+                registry_name=args[0],
+                location=location,
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

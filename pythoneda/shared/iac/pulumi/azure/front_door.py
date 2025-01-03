@@ -20,9 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class FrontDoor(AzureResource):
@@ -62,11 +63,11 @@ class FrontDoor(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
+        self._profile_name = profileName
+        self._front_door_type = frontDoorType
         super().__init__(
             stackName, projectName, location, {"resource_group": resourceGroup}
         )
-        self._profile_name = profileName
-        self._front_door_type = frontDoorType
 
     @property
     def profile_name(self) -> str:
@@ -139,7 +140,25 @@ class FrontDoor(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.cdn.Profile
         """
-        pulumi.export("front_door", resource.name)
+        pulumi.export(Outputs.FRONT_DOOR.value, resource.name)
+        pulumi.export(Outputs.FRONT_DOOR_ID.value, resource.id)
+
+    @classmethod
+    def from_id(cls, id: str, name: str = None) -> pulumi_azure_native.cdn.Profile:
+        """
+        Retrieves a FrontDoor instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The Profile.
+        :rtype: pulumi_azure_native.cdn.Profile
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.cdn.Profile.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

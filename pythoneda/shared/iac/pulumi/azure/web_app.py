@@ -23,12 +23,13 @@ from .azure_resource import AzureResource
 from .app_insights import AppInsights
 from .app_service_plan import AppServicePlan
 from .container_registry import ContainerRegistry
-from .resource_group import ResourceGroup
-from .storage_account import StorageAccount
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
 from pulumi_azure_native.storage import list_storage_account_keys
 from pulumi import Output
+from .resource_group import ResourceGroup
+from .storage_account import StorageAccount
 
 
 class WebApp(AzureResource):
@@ -86,6 +87,10 @@ class WebApp(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
+        self._image_name = imageName
+        self._image_version = imageVersion
+        self._login_server = loginServer
+        self._linux_fx_version = linuxFxVersion
         super().__init__(
             stackName,
             projectName,
@@ -98,11 +103,6 @@ class WebApp(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
-
-        self._image_name = imageName
-        self._image_version = imageVersion
-        self._login_server = loginServer
-        self._linux_fx_version = linuxFxVersion
 
     @property
     def image_name(self) -> str:
@@ -178,12 +178,12 @@ class WebApp(AzureResource):
         image_url = self.login_server.apply(
             lambda login_server: f"{login_server}/{self.image_name}:{self.image_version}"
         )
-        pulumi.export("image_url", image_url)
+        pulumi.export(Outputs.IMAGE_URL.value, image_url)
 
         if self.linux_fx_version is None:
             linux_fx_version = image_url.apply(lambda url: f"DOCKER|{url}")
 
-        pulumi.export("linux_fx_version", linux_fx_version)
+        pulumi.export(Outputs.LINUX_FX_VERSION.value, linux_fx_version)
 
         acr_credentials = (
             pulumi_azure_native.containerregistry.list_registry_credentials(
@@ -296,7 +296,25 @@ class WebApp(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.WebApp
         """
-        pulumi.export("web_app", resource.name)
+        pulumi.export(Outputs.WEB_APP.value, resource.name)
+        pulumi.export(Outputs.WEB_APP_ID.value, resource.id)
+
+    @classmethod
+    def from_id(cls, id: str, name: str = None) -> pulumi_azure_native.web.WebApp:
+        """
+        Retrieves a WebApp instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The WebApp.
+        :rtype: pulumi_azure_native.web.WebApp
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.web.WebApp.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

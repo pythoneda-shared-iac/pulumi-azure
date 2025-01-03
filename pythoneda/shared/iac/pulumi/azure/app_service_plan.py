@@ -20,9 +20,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 
 
 class AppServicePlan(AzureResource):
@@ -71,14 +72,14 @@ class AppServicePlan(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
-        super().__init__(
-            stackName, projectName, location, {"resource_group": resourceGroup}
-        )
         self._kind = kind
         self._tier_type = tierType
         self._tier_name = tierName
         self._capacity = capacity
         self._target_worker_count = targetWorkerCount
+        super().__init__(
+            stackName, projectName, location, {"resource_group": resourceGroup}
+        )
 
     @property
     def kind(self) -> str:
@@ -179,7 +180,27 @@ class AppServicePlan(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.web.AppServicePlan
         """
-        pulumi.export("app_service_plan", resource.name)
+        pulumi.export(Outputs.APP_SERVICE_PLAN.value, resource.name)
+        pulumi.export(Outputs.APP_SERVICE_PLAN_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.web.AppServicePlan:
+        """
+        Retrieves an AppServicePlan instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The AppServicePlan.
+        :rtype: pulumi_azure_native.web.AppServicePlan
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.web.AppServicePlan.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

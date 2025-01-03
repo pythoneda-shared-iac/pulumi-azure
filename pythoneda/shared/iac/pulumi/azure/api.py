@@ -21,9 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
 from .api_management_service import ApiManagementService
-from .resource_group import ResourceGroup
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
+from .resource_group import ResourceGroup
 from typing import List
 
 
@@ -67,6 +68,8 @@ class Api(AzureResource):
         :param resourceGroup: The ResourceGroup.
         :type resourceGroup: pythoneda.iac.pulumi.azure.ResourceGroup
         """
+        self._path = path
+        self._protocols = protocols
         super().__init__(
             stackName,
             projectName,
@@ -76,8 +79,6 @@ class Api(AzureResource):
                 "resource_group": resourceGroup,
             },
         )
-        self._path = path
-        self._protocols = protocols
 
     @property
     def path(self) -> str:
@@ -148,7 +149,27 @@ class Api(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.apimanagement.Api
         """
-        pulumi.export("api", resource.name)
+        pulumi.export(Outputs.API.value, resource.name)
+        pulumi.export(Outputs.API_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str = None
+    ) -> pulumi_azure_native.apimanagement.Api:
+        """
+        Retrieves an Api instance from an ID.
+        :param name: The Pulumi name.
+        :type name: str
+        :param id: The ID.
+        :type id: str
+        :return: The Api.
+        :rtype: pulumi_azure_native.apimanagement.Api
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.apimanagement.Api.get(
+                resource_name=args[0], opts=pulumi.ResourceOptions(id=args[1])
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et

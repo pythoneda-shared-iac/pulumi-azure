@@ -20,6 +20,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from .azure_resource import AzureResource
+from .outputs import Outputs
 import pulumi
 import pulumi_azure_native
 
@@ -95,7 +96,32 @@ class ResourceGroup(AzureResource):
         :param resource: The resource.
         :type resource: pulumi_azure_native.resources.ResourceGroup
         """
-        pulumi.export("resource_group", resource.name)
+        pulumi.export(Outputs.RESOURCE_GROUP.value, resource.name)
+        pulumi.export(Outputs.RESOURCE_GROUP_ID.value, resource.id)
+
+    @classmethod
+    def from_id(
+        cls, id: str, name: str, location: str
+    ) -> pulumi_azure_native.resources.ResourceGroup:
+        """
+        Retrieves a ResourceGroup instance from an ID.
+        :param id: The ID.
+        :type id: str
+        :param name: The Pulumi name.
+        :type name: str
+        :param location: The location.
+        :type location: str
+        :return: The ResourceGroup.
+        :rtype: pulumi_azure_native.resources.ResourceGroup
+        """
+        return pulumi.Output.all(name, id).apply(
+            lambda args: pulumi_azure_native.resources.ResourceGroup(
+                args[0],
+                location=location,
+                resource_group_name=args[0],
+                opts=pulumi.ResourceOptions(id=args[1]),
+            )
+        )
 
 
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et
