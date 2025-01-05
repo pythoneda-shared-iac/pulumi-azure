@@ -298,6 +298,7 @@ class WebApp(AzureResource):
         """
         pulumi.export(Outputs.WEB_APP.value, resource.name)
         pulumi.export(Outputs.WEB_APP_ID.value, resource.id)
+        pulumi.export(Outputs.API_DOMAIN.value, resource.default_host_name)
 
     @classmethod
     def from_id(cls, id: str, name: str = None) -> pulumi_azure_native.web.WebApp:

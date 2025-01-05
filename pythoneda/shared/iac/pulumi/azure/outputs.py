@@ -37,10 +37,11 @@ class Outputs(Enum):
 
     API = "api"
     API_ID = "api_id"
-    API_MANAGEMENT_SERVICE = "api_management_service"
-    API_MANAGEMENT_SERVICE_ID = "api_management_service_id"
     APP_INSIGHTS = "app_insights"
     APP_INSIGHTS_ID = "app_insights_id"
+    API_MANAGEMENT_SERVICE = "api_management_service"
+    API_MANAGEMENT_SERVICE_ID = "api_management_service_id"
+    API_DOMAIN = "api_domain"
     APP_SERVICE_PLAN = "app_service_plan"
     APP_SERVICE_PLAN_ID = "app_service_plan_id"
     BLOB = "blob"
